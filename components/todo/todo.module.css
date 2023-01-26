@@ -36,6 +36,10 @@
 .todoList {
   height: 90%;
 }
+.todo-wrap {
+  display: flex;
+  justify-content: space-between;
+}
 
 .add-todo-wrap {
   width: 100%;
