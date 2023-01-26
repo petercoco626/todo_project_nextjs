@@ -1,0 +1,53 @@
+.todo {
+  width: 300px;
+  height: 400px;
+  background-color: #3e3b6f;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 10%;
+}
+
+.option-wrap {
+  display: flex;
+  gap: 4px;
+}
+
+.option {
+  color: #ca7026;
+  font-weight: 900;
+}
+
+.content {
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todoList {
+  height: 90%;
+}
+
+.add-todo-wrap {
+  width: 100%;
+  display: flex;
+}
+
+.add-todo-input {
+  width: 80%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.add-todo-btn {
+  width: 20%;
+}
