@@ -1,9 +1,9 @@
 import { todoReducer } from '@/reducer/todo-reducer';
 import React, { ReactPropTypes, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import styles from './todo.module.css';
-
+import { v4 as uuidv4 } from 'uuid';
 export interface Todo {
-  id: number;
+  id: string;
   text: string;
   isFinish: boolean;
 }
@@ -13,7 +13,6 @@ type Filter = 'all' | 'active' | 'completed';
 export default function Todo() {
   const [todoList, dispatch] = useReducer(todoReducer, []);
   const [filteredTodoList, setFilteredTodoList] = useState<Todo[]>([]);
-  const todoId = useRef(todoList.length);
   const [todo, setTodo] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -21,14 +20,15 @@ export default function Todo() {
     (e: React.FormEvent<HTMLFormElement>) => {
       console.log('press enter');
       e.preventDefault();
+      if (todo.trim().length === 0) return;
+
       dispatch({
-        id: todoId.current,
+        id: uuidv4(),
         newTodo: todo,
         type: 'add',
         checked: false,
         todoList: [],
       });
-      todoId.current = todoId.current + 1;
       setTodo('');
     },
     [todo]
@@ -38,7 +38,7 @@ export default function Todo() {
     setTodo(e.currentTarget.value);
   }, []);
 
-  const handleClickCheckBox = useCallback((e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+  const handleClickCheckBox = useCallback((e: React.ChangeEvent<HTMLInputElement>, id: string) => {
     console.log(e.target.checked);
     dispatch({
       id,
@@ -49,7 +49,7 @@ export default function Todo() {
     });
   }, []);
 
-  const deleteTodo = useCallback((id: number) => {
+  const deleteTodo = useCallback((id: string) => {
     dispatch({
       id,
       newTodo: '',
@@ -82,19 +82,12 @@ export default function Todo() {
     if (savedRawTodoListData) {
       const savedTodoListData = JSON.parse(savedRawTodoListData);
       dispatch({
-        id: 0,
+        id: '',
         newTodo: '',
         type: 'initialize',
         checked: false,
         todoList: savedTodoListData as Todo[],
       });
-
-      /** max에 배열을 넣을때는 spread연산자로 얕은 복사릃 해줘야한다. */
-      todoId.current = Math.max(
-        ...savedTodoListData.map((todo: Todo) => {
-          return todo.id;
-        })
-      );
     }
   }, []);
 

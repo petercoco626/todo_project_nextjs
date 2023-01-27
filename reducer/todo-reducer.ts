@@ -1,7 +1,7 @@
 import { Todo } from '@/components/todo/todo';
 
 interface Action {
-  id: number;
+  id: string;
   newTodo: string;
   type: 'add' | 'delete' | 'checkTodo' | 'initialize';
   checked: boolean;
@@ -15,7 +15,7 @@ export function todoReducer(todoList: Todo[], action: Action): Todo[] {
     case 'add':
       const addedTodoList: Todo[] = [
         {
-          id: action.id + 1,
+          id: action.id,
           text: action.newTodo,
           isFinish: false,
         },
