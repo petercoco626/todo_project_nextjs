@@ -24,6 +24,12 @@
 .option {
   color: #ca7026;
   font-weight: 900;
+  cursor: pointer;
+}
+.selected-option {
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .content {

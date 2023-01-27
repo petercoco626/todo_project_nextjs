@@ -11,7 +11,7 @@ type Filter = 'all' | 'active' | 'completed';
 
 export default function Todo() {
   const [todoList, setTodoList] = useState<Todo[]>([]);
-
+  const [filteredTodoList, setFilteredTodoList] = useState<Todo[]>([]);
   const todoId = useRef(todoList.length);
   const [todo, setTodo] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
@@ -20,14 +20,16 @@ export default function Todo() {
     (e: React.FormEvent<HTMLFormElement>) => {
       console.log('press enter');
       e.preventDefault();
-      setTodoList([
+      const addedTodoList = [
         {
           id: todoId.current + 1,
           text: todo,
           isFinish: false,
         },
         ...todoList,
-      ]);
+      ];
+      setTodoList(addedTodoList);
+      localStorage.setItem('todoList', JSON.stringify(addedTodoList));
       todoId.current = todoId.current + 1;
       setTodo('');
     },
@@ -38,43 +40,93 @@ export default function Todo() {
     setTodo(e.currentTarget.value);
   }, []);
 
-  const handleClickCheckBox = useCallback((e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    console.log(e.target.checked);
-    setTodoList((pre) =>
-      pre.map((todo) => {
+  const handleClickCheckBox = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+      console.log(e.target.checked);
+
+      const clickedCheckBox = todoList.map((todo) => {
         if (todo.id === id) {
           todo.isFinish = e.target.checked;
         }
         return todo;
-      })
-    );
-  }, []);
+      });
 
-  const deleteTodo = useCallback((id: number) => {
-    setTodoList((pre) => {
-      return pre.filter((todo) => todo.id !== id);
-    });
+      setTodoList(clickedCheckBox);
+      localStorage.setItem('todoList', JSON.stringify(clickedCheckBox));
+    },
+    [todoList]
+  );
+
+  const deleteTodo = useCallback(
+    (id: number) => {
+      const deletedTodoList = todoList.filter((todo) => todo.id !== id);
+
+      setTodoList(deletedTodoList);
+      localStorage.setItem('todoList', JSON.stringify(deletedTodoList));
+    },
+    [todoList]
+  );
+
+  const handleChangingFilter = useCallback((selectedFilter: Filter) => {
+    setFilter(selectedFilter);
   }, []);
 
   useEffect(() => {
     switch (filter) {
       case 'all':
+        setFilteredTodoList(todoList);
+        break;
+      case 'active':
+        setFilteredTodoList(todoList.filter((todo: Todo) => !todo.isFinish));
+        break;
+      case 'completed':
+        setFilteredTodoList(todoList.filter((todo: Todo) => todo.isFinish));
+        break;
     }
-  }, [filter]);
+  }, [filter, todoList]);
+
+  useEffect(() => {
+    const savedRawTodoListData = localStorage.getItem('todoList');
+    if (savedRawTodoListData) {
+      const savedTodoListData = JSON.parse(savedRawTodoListData);
+      setTodoList(savedTodoListData);
+    }
+  }, []);
 
   return (
     <div className={styles.todo}>
       <div className={styles.navbar}>
         <div>darkmode</div>
         <div className={styles['option-wrap']}>
-          <div className={styles.option}>ALL</div>
-          <div className={styles.option}>Active</div>
-          <div className={styles.option}>Completed</div>
+          <div
+            className={filter === 'all' ? styles['selected-option'] : styles.option}
+            onClick={() => {
+              handleChangingFilter('all');
+            }}
+          >
+            ALL
+          </div>
+          <div
+            className={filter === 'active' ? styles['selected-option'] : styles.option}
+            onClick={() => {
+              handleChangingFilter('active');
+            }}
+          >
+            Active
+          </div>
+          <div
+            className={filter === 'completed' ? styles['selected-option'] : styles.option}
+            onClick={() => {
+              handleChangingFilter('completed');
+            }}
+          >
+            Completed
+          </div>
         </div>
       </div>
       <div className={styles.content}>
         <div className={styles.todoList}>
-          {todoList.map((todo: Todo) => (
+          {filteredTodoList.map((todo: Todo) => (
             <div key={todo.id} className={styles['todo-wrap']}>
               <input
                 type="checkbox"
