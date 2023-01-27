@@ -1,7 +1,8 @@
-import React, { ReactPropTypes, useCallback, useEffect, useRef, useState } from 'react';
+import { todoReducer } from '@/reducer/todo-reducer';
+import React, { ReactPropTypes, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import styles from './todo.module.css';
 
-interface Todo {
+export interface Todo {
   id: number;
   text: string;
   isFinish: boolean;
@@ -10,7 +11,7 @@ interface Todo {
 type Filter = 'all' | 'active' | 'completed';
 
 export default function Todo() {
-  const [todoList, setTodoList] = useState<Todo[]>([]);
+  const [todoList, dispatch] = useReducer(todoReducer, []);
   const [filteredTodoList, setFilteredTodoList] = useState<Todo[]>([]);
   const todoId = useRef(todoList.length);
   const [todo, setTodo] = useState('');
@@ -20,52 +21,43 @@ export default function Todo() {
     (e: React.FormEvent<HTMLFormElement>) => {
       console.log('press enter');
       e.preventDefault();
-      const addedTodoList = [
-        {
-          id: todoId.current + 1,
-          text: todo,
-          isFinish: false,
-        },
-        ...todoList,
-      ];
-      setTodoList(addedTodoList);
-      localStorage.setItem('todoList', JSON.stringify(addedTodoList));
+      dispatch({
+        id: todoId.current,
+        newTodo: todo,
+        type: 'add',
+        checked: false,
+        todoList: [],
+      });
       todoId.current = todoId.current + 1;
       setTodo('');
     },
-    [todo, todoList]
+    [todo]
   );
 
   const handleEditTodo = useCallback((e: React.FormEvent<HTMLInputElement>) => {
     setTodo(e.currentTarget.value);
   }, []);
 
-  const handleClickCheckBox = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-      console.log(e.target.checked);
+  const handleClickCheckBox = useCallback((e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+    console.log(e.target.checked);
+    dispatch({
+      id,
+      newTodo: '',
+      type: 'checkTodo',
+      checked: e.target.checked,
+      todoList: [],
+    });
+  }, []);
 
-      const clickedCheckBox = todoList.map((todo) => {
-        if (todo.id === id) {
-          todo.isFinish = e.target.checked;
-        }
-        return todo;
-      });
-
-      setTodoList(clickedCheckBox);
-      localStorage.setItem('todoList', JSON.stringify(clickedCheckBox));
-    },
-    [todoList]
-  );
-
-  const deleteTodo = useCallback(
-    (id: number) => {
-      const deletedTodoList = todoList.filter((todo) => todo.id !== id);
-
-      setTodoList(deletedTodoList);
-      localStorage.setItem('todoList', JSON.stringify(deletedTodoList));
-    },
-    [todoList]
-  );
+  const deleteTodo = useCallback((id: number) => {
+    dispatch({
+      id,
+      newTodo: '',
+      type: 'delete',
+      checked: false,
+      todoList: [],
+    });
+  }, []);
 
   const handleChangingFilter = useCallback((selectedFilter: Filter) => {
     setFilter(selectedFilter);
@@ -89,7 +81,20 @@ export default function Todo() {
     const savedRawTodoListData = localStorage.getItem('todoList');
     if (savedRawTodoListData) {
       const savedTodoListData = JSON.parse(savedRawTodoListData);
-      setTodoList(savedTodoListData);
+      dispatch({
+        id: 0,
+        newTodo: '',
+        type: 'initialize',
+        checked: false,
+        todoList: savedTodoListData as Todo[],
+      });
+
+      /** max에 배열을 넣을때는 spread연산자로 얕은 복사릃 해줘야한다. */
+      todoId.current = Math.max(
+        ...savedTodoListData.map((todo: Todo) => {
+          return todo.id;
+        })
+      );
     }
   }, []);
 
