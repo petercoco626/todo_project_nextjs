@@ -138,11 +138,14 @@ export default function Todo() {
               <input
                 type="checkbox"
                 checked={todo.isFinish}
+                id={todo.id}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   handleClickCheckBox(e, todo.id)
                 }
               />
-              <div className={styles['todo-text']}>{todo.text}</div>
+              <label htmlFor={todo.id} className={styles['todo-text']}>
+                {todo.text}
+              </label>
               <button onClick={() => deleteTodo(todo.id)}>삭제</button>
             </div>
           ))}
