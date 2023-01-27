@@ -1,7 +1,7 @@
 .todo {
   width: 300px;
   height: 400px;
-  background-color: #3e3b6f;
+  background-color: var(--color-bg);
   padding: 16px;
   box-sizing: border-box;
   display: flex;
@@ -18,16 +18,16 @@
 
 .option-wrap {
   display: flex;
-  gap: 4px;
+  gap: 8px;
 }
 
 .option {
-  color: #ca7026;
+  color: var(--color-non-selected-filter-option);
   font-weight: 900;
   cursor: pointer;
 }
 .selected-option {
-  color: #ffffff;
+  color: var(--color-selected-filter-option);
   font-weight: 900;
   cursor: pointer;
 }
@@ -51,13 +51,24 @@
   width: 100%;
   display: flex;
 }
+.todo-text {
+  color: var(--color-todo-text);
+}
 
 .add-todo-input {
   width: 80%;
   padding: 8px;
   box-sizing: border-box;
+  border: 0;
 }
 
 .add-todo-btn {
   width: 20%;
+  background-color: var(--color-botton);
+  border: 0;
+}
+
+.darkMode {
+  cursor: pointer;
+  color: var(--color-darkmode);
 }

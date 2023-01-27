@@ -1,0 +1,15 @@
+:root {
+  --color-bg: #3e3b6f;
+  --color-todo-text: #ffffff;
+  --color-selected-filter-option: #ffffff;
+  --color-non-selected-filter-option: #ca7026;
+  --color-darkmode: #ca7026;
+  --color-botton: #ca7026;
+}
+
+html.dark {
+  --color-bg: #76af5d;
+  --color-todo-text: #000000;
+  --color-selected-filter-option: #000000;
+  --color-darkmode: #000000;
+}

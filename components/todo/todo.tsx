@@ -2,6 +2,7 @@ import { todoReducer } from '@/reducer/todo-reducer';
 import React, { ReactPropTypes, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import styles from './todo.module.css';
 import { v4 as uuidv4 } from 'uuid';
+import { useDarkModeDispatch, useDarkModeState } from '@/context/DarkModeContext';
 export interface Todo {
   id: string;
   text: string;
@@ -11,10 +12,16 @@ export interface Todo {
 type Filter = 'all' | 'active' | 'completed';
 
 export default function Todo() {
+  const darkModeDispatch = useDarkModeDispatch();
+  const darkMode = useDarkModeState();
   const [todoList, dispatch] = useReducer(todoReducer, []);
   const [filteredTodoList, setFilteredTodoList] = useState<Todo[]>([]);
   const [todo, setTodo] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+
+  const toggleDarkMode = useCallback(() => {
+    darkModeDispatch({ type: 'toggle' });
+  }, [darkModeDispatch]);
 
   const handleAddTodoList = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -94,7 +101,9 @@ export default function Todo() {
   return (
     <div className={styles.todo}>
       <div className={styles.navbar}>
-        <div>darkmode</div>
+        <div className={styles.darkMode} onClick={toggleDarkMode}>
+          {darkMode ? 'dark' : 'light'}
+        </div>
         <div className={styles['option-wrap']}>
           <div
             className={filter === 'all' ? styles['selected-option'] : styles.option}
@@ -133,7 +142,7 @@ export default function Todo() {
                   handleClickCheckBox(e, todo.id)
                 }
               />
-              <div>{todo.text}</div>
+              <div className={styles['todo-text']}>{todo.text}</div>
               <button onClick={() => deleteTodo(todo.id)}>삭제</button>
             </div>
           ))}
